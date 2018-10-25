@@ -1,0 +1,5 @@
+﻿  main.c
+c:\users\9518\documents\gitrepo\magneticstripecard_parsing\magneticstripecard_parsing\main.c(122): warning C4018: '<': signed/unsigned 不相符
+c:\users\9518\documents\gitrepo\magneticstripecard_parsing\magneticstripecard_parsing\main.c(294): warning C4018: '<': signed/unsigned 不相符
+c:\users\9518\documents\gitrepo\magneticstripecard_parsing\magneticstripecard_parsing\main.c(435): warning C4018: '<': signed/unsigned 不相符
+  MagneticStripeCard_Parsing.vcxproj -> C:\Users\9518\Documents\GitRepo\MagneticStripeCard_Parsing\Debug\MagneticStripeCard_Parsing.exe
