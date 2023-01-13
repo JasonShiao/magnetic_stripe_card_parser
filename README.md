@@ -1,5 +1,5 @@
 ## Magnetic Stripe Card track data parser
-Parse the data in magnetic stripe card based on the spec of ISO-7811 and ISO-7816
+Parse the data in magnetic stripe card based on the spec of ISO-7811 and ISO-7813
 
 This program shows some details about the error in track data.
 
