@@ -2,18 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 typedef enum
 {
-
 	PAN,
 	name,
 	expire_date,
 	service_code,
 	discretionary,
 	end
-
-}Track_Field;
+} Track_Field;
 
 
 typedef struct
@@ -24,7 +21,7 @@ typedef struct
 	char expire_date[5];
 	char service_code[4];
 	char discretionary_data[80];
-}Track_1_Container;
+} Track_1_Container;
 
 typedef struct
 {
@@ -32,35 +29,29 @@ typedef struct
 	char expire_date[5];
 	char service_code[4];
 	char discretionary_data[40];
-}Track_2_Container;
-
+} Track_2_Container;
 
 int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info);
 int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info);
 int extract_track_2_data(char* track_2_data, Track_2_Container* track_2_info);
 
-
 int main()
 {
-
+	// Sample input data
 	char *track_1_data = "%B4815881002861896^YATES/EUGENE JOHN^99019821000123456789?";
 	char *track_2_data = ";4815881002861896=990110123456700000?";
 
-
 	Track_1_Container *track_1_info = malloc(sizeof(Track_1_Container));
-	if (extract_track_1_data_v2(track_1_data, track_1_info) != 1)
+	if (extract_track_1_data_v2(track_1_data, track_1_info))
 	{
-		/* error */
 		printf("error\n");
 	}
 
 	Track_2_Container *track_2_info = malloc(sizeof(Track_2_Container));
-	if (extract_track_2_data(track_2_data, track_2_info) != 1)
+	if (extract_track_2_data(track_2_data, track_2_info))
 	{
-		/* error */
 		printf("error\n");
 	}
-
 
 	printf("==========================================================\n");
 	printf("                       Track 1 data                       \n");
@@ -71,8 +62,6 @@ int main()
 	printf("Service code: %s\n", track_1_info->service_code);
 	printf("Discretionary data: %s\n", track_1_info->discretionary_data);
 
-
-
 	printf("==========================================================\n");
 	printf("                       Track 2 data                       \n");
 	printf("==========================================================\n");
@@ -81,10 +70,9 @@ int main()
 	printf("Service code: %s\n", track_2_info->service_code);
 	printf("Discretionary data: %s\n", track_2_info->discretionary_data);
 
-
-
+#if defined(_WIN32)
 	system("pause");
-
+#endif
 
 	return 0;
 }
@@ -93,7 +81,6 @@ int main()
 
 int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 {
-
 	size_t PAN_len = 0;
 	size_t name_len = 0;
 	size_t expiration_date_len = 0;
@@ -103,14 +90,13 @@ int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 	if (strlen(track_1_data) <= 2 || track_1_data[0] != '%' || track_1_data[1] != 'B')
 	{
 		printf("Error: Invalid Magnetic Stripe Track 1 Data.\n");
-		return 0;
+		return 1;
 	}
 	if (track_1_data[1] != 'B')
 	{
 		printf("Error: Invalid foramt code.\n");
-		return 0;
+		return 1;
 	}
-
 
 	size_t field_start_index = 2;
 	Track_Field state = PAN;
@@ -129,7 +115,7 @@ int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 				if (PAN_len > 19 || PAN_len < 12)
 				{
 					printf("Error: Invalid PAN length.\n");
-					return 0;
+					return 1;
 				}
 				/* fill PAN data */
 				memcpy(track_1_info->PAN, track_1_data + field_start_index, PAN_len);
@@ -141,7 +127,7 @@ int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 			else
 			{
 				printf("Error: Invalid char in PAN field.\n");
-				return 0;
+				return 1;
 			}
 			break;
 		case name:
@@ -154,7 +140,7 @@ int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 				if (name_len > 26 || name_len < 2)
 				{
 					printf("Error: Invalid name length.\n");
-					return 0;
+					return 1;
 				}
 				/* fill name data */
 				memcpy(track_1_info->name, track_1_data + field_start_index, name_len);
@@ -166,7 +152,7 @@ int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 			else
 			{
 				printf("Error: Invalid char in name field.\n");
-				return 0;
+				return 1;
 			}
 			break;
 		case expire_date:
@@ -200,7 +186,7 @@ int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 			else 
 			{
 				printf("Error: Invalid char in expire date field.\n");
-				return 0;
+				return 1;
 			}
 			break;
 		case service_code:
@@ -234,7 +220,7 @@ int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 			else
 			{
 				printf("Error: Invalid char in service code field.\n");
-				return 0;
+				return 1;
 			}
 			break;
 		case discretionary:
@@ -258,31 +244,27 @@ int extract_track_1_data(char* track_1_data, Track_1_Container* track_1_info)
 		if (i > 78)
 		{
 			printf("Error: Invalid track 1 data length.\n");
-			return 0;
+			return 1;
 		}
 	}
 
-	return 1; /* successfully */
-
+	return 0; /* successfully */
 }
 
 
 int extract_track_2_data(char* track_2_data, Track_2_Container* track_2_info)
 {
-
 	size_t PAN_len = 0;
 	size_t expiration_date_len = 0;
 	size_t service_code_len = 0;
 	size_t discretionary_len = 0;
 
-
 	/* Track 2 */
 	if (strlen(track_2_data) <= 2 || track_2_data[0] != ';')
 	{
 		printf("Error: Invalid Magnetic Stripe Track 2 Data.\n");
-		return 0;
+		return 1;
 	}
-
 
 	size_t field_start_index = 1;
 	Track_Field state_2 = PAN;
@@ -301,7 +283,7 @@ int extract_track_2_data(char* track_2_data, Track_2_Container* track_2_info)
 					if (PAN_len > 19 || PAN_len < 12)
 					{
 						printf("Error: Invalid PAN length.\n");
-						return 0;
+						return 1;
 					}
 					/* fill PAN data */
 					memcpy(track_2_info->PAN, track_2_data + field_start_index, PAN_len);
@@ -313,7 +295,7 @@ int extract_track_2_data(char* track_2_data, Track_2_Container* track_2_info)
 				else
 				{
 					printf("Error: Invalid char in PAN field.\n");
-					return 0;
+					return 1;
 				}
 				break;
 			case expire_date:
@@ -347,7 +329,7 @@ int extract_track_2_data(char* track_2_data, Track_2_Container* track_2_info)
 				else
 				{
 					printf("Error: Invalid char in expire date field.\n");
-					return 0;
+					return 1;
 				}
 				break;
 			case service_code:
@@ -381,7 +363,7 @@ int extract_track_2_data(char* track_2_data, Track_2_Container* track_2_info)
 				else
 				{
 					printf("Error: Invalid char in service code field.\n");
-					return 0;
+					return 1;
 				}
 				break;
 			case discretionary:
@@ -405,18 +387,16 @@ int extract_track_2_data(char* track_2_data, Track_2_Container* track_2_info)
 		if (i > 42)
 		{
 			printf("Error: Invalid track 2 data length.\n");
-			return 0;
+			return 1;
 		}
 	}
 
-	return 1; /* successfully */
-
+	return 0; /* successfully */
 }
 
 
 int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 {
-
 	char start_sentinel = '%';
 	char end_sentinel = '?';
 	char field_separator = '^';
@@ -446,24 +426,22 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 		if (separator_num > 4)
 		{
 			printf("Invalid number of separator '%c'.\n", field_separator);
-			return 0;
+			return 1;
 		}
 	}
-
 
 	if (start_sentinel_index != 0 || (end_sentinel_index != (strlen(track_1_data) - 1)))
 	{
 		printf("Invalid start sentinel or end sentinel.\n");
-		return 0;
+		return 1;
 	}
-
 
 	if (separator_num == 2)
 	{
 		if ((separator_indices[0] - start_sentinel_index - 1 - 1) < 12 || separator_indices[0] > 22)
 		{
 			printf("Error: Invalid PAN length.\n");
-			return 0;
+			return 1;
 		}
 
 		track_1_info->format_code = track_1_data[0];
@@ -473,7 +451,7 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 		if ((separator_indices[1] - separator_indices[0] - 1) < 2 || (separator_indices[1] - separator_indices[0] - 1) > 26)
 		{
 			printf("Error: Invalid name length.\n");
-			return 0;
+			return 1;
 		}
 		memcpy(track_1_info->name, track_1_data + separator_indices[0] + 1, separator_indices[1] - separator_indices[0] - 1);
 		memset(track_1_info->name + separator_indices[1] - separator_indices[0] - 1, 0, 1);
@@ -493,7 +471,7 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 		if (separator_indices[0] < 14 || separator_indices[0] > 22)
 		{
 			printf("Error: Invalid PAN length.\n");
-			return 0;
+			return 1;
 		}
 
 		track_1_info->format_code = track_1_data[0];
@@ -503,7 +481,7 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 		if ((separator_indices[1] - separator_indices[0] - 1) < 2 || (separator_indices[1] - separator_indices[0] - 1) > 26)
 		{
 			printf("Error: Invalid name length.\n");
-			return 0;
+			return 1;
 		}
 
 		memcpy(track_1_info->name, track_1_data + separator_indices[0] + 1, separator_indices[1] - separator_indices[0] - 1);
@@ -533,18 +511,15 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 		else
 		{
 			printf("Error: Invalid expire date length or service code length.\n");
-			return 0;
+			return 1;
 		}
-
-
-
 	}
 	else if (separator_num == 4 )
 	{
 		if (separator_indices[0] < 14 || separator_indices[0] > 22)
 		{
 			printf("Error: Invalid PAN length.\n");
-			return 0;
+			return 1;
 		}
 
 		track_1_info->format_code = track_1_data[0];
@@ -554,7 +529,7 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 		if ((separator_indices[1] - separator_indices[0] - 1) < 2 || (separator_indices[1] - separator_indices[0] - 1) > 26)
 		{
 			printf("Error: Invalid name length.\n");
-			return 0;
+			return 1;
 		}
 		memcpy(track_1_info->name, track_1_data + separator_indices[0] + 1, separator_indices[1] - separator_indices[0] - 1);
 		memset(track_1_info->name + separator_indices[1] - separator_indices[0] - 1, 0, 1);
@@ -566,7 +541,7 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 		else
 		{
 			printf("Error: Invalid expiration date field length.\n");
-			return 0;
+			return 1;
 		}
 		if (separator_indices[3] - separator_indices[2] == 1)
 		{
@@ -575,7 +550,7 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 		else
 		{
 			printf("Error: Invalid service code field length.\n");
-			return 0;
+			return 1;
 		}
 		
 		memcpy(track_1_info->discretionary_data, track_1_data + separator_indices[3] + 1, end_sentinel_index - separator_indices[3] - 1);
@@ -585,9 +560,8 @@ int extract_track_1_data_v2(char* track_1_data, Track_1_Container* track_1_info)
 	else
 	{
 		printf("Invalid number of separator '%c'.\n", field_separator);
-		return 0;
+		return 1;
 	}
 
-	return 1;
-
+	return 0;
 }
